@@ -4,6 +4,8 @@ Each release's page on GitHub has its notes and measurements. See [the 1.0.0 rel
 
 ## Unreleased
 
+- Flash Next on Metal: checkpoints with TFQ3 (`2D-AffineCoset/half4`) routed MoE sidecars (`pw_v3_tables.bin`, `layer_XX.tffpw`, `mtp_00.tffpw`) load zero-copy and dispatch native TFQ3 Metal kernels for decode (`B=1` and deduplicated `B=2..16`) and prompt prefill (both M5 NAX and pre-M5 `TF_SIMD_FRAGS`), while non-TFQ3 checkpoints stay on the existing MLX affine paths unchanged; `--ple-on-ssd` works with TFQ3 and incompatible `--ssd-experts` is refused cleanly. On an M5 Ultra, `Qwen3.8-Flash-Next-TFQ3` (`78.99 GiB`, 8-bit non-MoE + 3-bit PLE + HeatAlloc TFQ3 MoE) reaches `5.996` combined PPL across 2,004 eval tokens (vs `6.007` 8-bit source and `6.644` MLX 4-bit) at `3,855 tok/s` `p2048` prefill, `82.9 tok/s` `B=1` decode, and `154.5 tok/s` `MTP depth=3` with bit-exact `depth 0 == depth 3` parity (#4964).
+
 - Nemotron 3.5 Transcribe on CUDA: chat requests take speech as 16 kHz mono WAV in OpenAI `input_audio` and vLLM `audio_url` parts, up to an hour of audio a request in the model's trained 65,536-token window, with each clip's rows keyed in the prompt cache and MTP drafts running over them; `/v1/models` lists `audio` among its input types (#1632, closes #1549). Thanks to @BobClawblaw.
 
 - Inkling 2 Mini on Metal: the startup line breaks the serve's demand into weights, dense layers and scratch, the state of each stream at the window and what the streams share, beside the room the load limit leaves; which streams and windows start is unchanged (#4705, refs #4274 and #4387).
