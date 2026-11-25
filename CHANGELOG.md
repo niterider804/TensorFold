@@ -4,6 +4,8 @@ Each release's page on GitHub has its notes and measurements. See [the 1.0.0 rel
 
 ## Unreleased
 
+- Tests: `test-metal-residency-owners-host` builds and passes again; its Qwen27 fixture no longer reads an unset draft-backend field (#4987).
+
 - Flash Next on CUDA: the checkpoint's `config.json` sets the routing width and the shared expert's width (`num_experts_per_tok`, `shared_expert_intermediate_size`): top-10 with a 640-wide shared expert as before, or top-5 with a 1280-wide one; any other value is refused at load by the field's name, and a captured kernel set or the MLX 4-bit path refuses the top-5 shape by name (#3523, refs #3368). Thanks to @BadAd84.
 
 - Metal: SenseNova-Loop-9B is served natively through the qwen27 lane backend in BF16 and AWQ 4-bit (group size 128), with its looped 56-step schedule, two-stream mHC, 512K YaRN context and vision, and drafts with its published `mtp.safetensors` (#3868, carries #3859, fixes #3781). Thanks @gilby.
